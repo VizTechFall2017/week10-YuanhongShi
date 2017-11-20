@@ -36,18 +36,11 @@ var albersProjection = d3.geoAlbersUsa()
     .scale(1000)
     .translate([(width/2), (height/2)]);
 
-//map function for Boston map
-var albersProjectionBoston = d3.geoAlbers()
-    .scale(145000 )
-    .rotate([71.057,0])
-    .center([0, 42.354175])
-    .translate([(.35*width/2), (.35*height/2)]);
 
 var path = d3.geoPath()
     .projection(albersProjection);
 
-var pathBoston = d3.geoPath()
-    .projection(albersProjectionBoston);
+
 
 //variaty for the cities
 var cityArrary = ['BOSTON IN MA',
@@ -138,9 +131,25 @@ d3.select('select')
         var selectCity = d3.select('select').property('value');
         console.log(selectCity);
 
-        if (selectCity == cityArrary[0]) {
+
+        var widthSvg1 = document.getElementById('svg1').clientWidth;
+        var heightSvg1 = document.getElementById('svg1').clientHeight;
+
+        //map function for Boston map
+        var albersProjectionBoston = d3.geoAlbers()
+            .scale(155000 )
+            .rotate([71.057,0])
+            .center([0, 42.313])
+            .translate([(widthSvg1/2), (heightSvg1/2)]);
+
+        var pathBoston = d3.geoPath()
+            .projection(albersProjectionBoston);
+
+
+
+
             console.log(selectCity);
-            d3.json('./neighborhood_boston.json', function(dataIn){
+            d3.json('./'+selectCity+'.json', function(dataIn){
                 //console.log(dataIn);
                 svg1.selectAll('path')
                     .data(dataIn.features)
@@ -184,10 +193,10 @@ d3.select('select')
                     .enter()
                     .append('circle')
                     .attr('cx', function (d){
-                        return albersProjection([d.long, d.lat])[0];
+                        return albersProjectionBoston([d.long, d.lat])[0];
                     })
                     .attr('cy', function (d){
-                        return albersProjection([d.long, d.lat])[1];
+                        return albersProjectionBoston([d.long, d.lat])[1];
                     })
                     .attr('r', 5)
                     .attr('fill', 'steelblue')
@@ -237,8 +246,32 @@ d3.select('select')
             });
 
 
-        }
-        else {
 
-        }
+
+
+
+        var defs = svg2.append('defs');
+        defs.append('pattern')
+            .attr('id','bg')
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', widthSvg1)
+            .attr('height', heightSvg1)
+            .append('image')
+            .attr('xlink:href', function(d){
+                return selectCity + '.png';
+
+            })
+            .attr('width', widthSvg1)
+            .attr('height', heightSvg1)
+            .attr('x', 0)
+            .attr('y', 0);
+
+        svg2.append('rect')
+            .attr('class', 'background')
+            .attr('width', widthSvg1)
+            .attr('height', heightSvg1)
+            .attr('fill', 'url(#bg)')
+            .attr('opacity', 0);
+
+
     });
