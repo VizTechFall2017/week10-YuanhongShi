@@ -29,13 +29,43 @@ var svg2 = d3.select('#svg2')
 
 var clickShow = false;
 
+
+
+//map function for USA map
 var albersProjection = d3.geoAlbersUsa()
     .scale(1000)
     .translate([(width/2), (height/2)]);
 
+//map function for Boston map
+var albersProjectionBoston = d3.geoAlbers()
+    .scale(150000 )
+    .rotate([71.057,0])
+    .center([0, 42.354175])
+    .translate([(.35*width/2), (.35*height/2)]);
 
 var path = d3.geoPath()
     .projection(albersProjection);
+
+var pathBoston = d3.geoPath()
+    .projection(albersProjectionBoston);
+
+//variaty for the cities
+var cityArrary = ['BOSTON IN MA',
+    'NEW YORK IN NY',
+    'CHICAGO IN CA',
+    'LOS ANGELES IN IL',
+    'PHOENIX IN AZ',
+    'SEATTLE IN WA'];
+
+
+//Downtown area position
+var arrayList = [
+    {long:-71.056612, lat:42.354175}
+];
+
+
+
+
 
 //import the data from the .csv file
 d3.json('./cb_2016_us_state_20m.json', function(dataIn){
@@ -99,10 +129,116 @@ d3.json('./cb_2016_us_state_20m.json', function(dataIn){
             document.getElementById('buttondiv').style.display = 'inline-block';
 
         });
-
-
-
 });
 
 
 
+d3.select('select')
+    .on('change', function(d){
+        var selectCity = d3.select('select').property('value');
+        console.log(selectCity);
+
+        if (selectCity == cityArrary[0]) {
+            console.log(selectCity);
+            d3.json('./neighborhood_boston.json', function(dataIn){
+                //console.log(dataIn);
+                svg1.selectAll('path')
+                    .data(dataIn.features)
+                    .enter()
+                    .append('path')
+                    .attr('d', pathBoston)
+                    .attr('fill', 'gainsboro')
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 1)
+                    .attr('data-toggle',"tooltip")
+                    .attr('title', function(d){
+                        if (d.properties.name == 'Downtown'){
+                            return 'CLICK ON THE DOT!'
+                        }
+                        else
+                            return d.properties.name;
+                    })
+                    .on('mouseover', function(d){
+                        if (d.properties.name == 'Downtown'){
+                            d3.select(this)
+                                .attr('fill', 'red');
+                        }
+                        else{
+                            d3.select(this)
+                                .attr('fill', 'yellow');
+                        }
+
+                    })
+                    .on('mouseout', function(d){
+                        d3.select(this)
+                            .attr('fill', 'gainsboro');
+                    })
+                    .on('click', function(d){
+
+                    });
+
+                //   $('[data-toggle="tooltip"]').tooltip();
+
+                svg1.selectAll('circle')
+                    .data(arrayList)
+                    .enter()
+                    .append('circle')
+                    .attr('cx', function (d){
+                        return albersProjection([d.long, d.lat])[0];
+                    })
+                    .attr('cy', function (d){
+                        return albersProjection([d.long, d.lat])[1];
+                    })
+                    .attr('r', 5)
+                    .attr('fill', 'steelblue')
+                    .attr('data-toggle',"tooltip")
+                    .attr('title', 'CLICK ON ME!')
+                    .on('mouseover', function(d){
+                        console.log('show some thing');
+                        d3.select(this)
+                        //why this tooltip not work!
+
+                            .transition()
+                            .duration(3000)
+                            .ease(d3.easeBounce)
+                            .attr('fill', 'red')
+                            .attr('r', 20)
+                            .attr('opacity', .8)
+                            .attr('stroke', 'white')
+                            .attr('stroke-width', 0.5);
+
+                    })
+
+                    .on('mouseout', function(d){
+                        d3.select(this)
+                            .transition()
+                            .duration(3000)
+                            .ease(d3.easeBounce)
+                            .attr('fill', 'steelblue')
+                            .attr('stroke', 'none')
+                            .attr('r', 5);
+                    })
+
+                    .on('click', function(d){
+                        d3.select(this)
+                            .attr('fill', 'red')
+                            .attr('r', 10);
+                        d3.select('.background')
+                            .transition()
+                            .duration(3000)
+                            .ease(d3.easeBounce)
+                            .attr('opacity', 1);
+
+                    });
+
+                $('[data-toggle="tooltip"]').tooltip();
+
+
+            });
+
+
+        }
+        else {
+
+        }
+    });
