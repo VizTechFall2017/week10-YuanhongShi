@@ -38,7 +38,7 @@ var albersProjection = d3.geoAlbersUsa()
 
 //map function for Boston map
 var albersProjectionBoston = d3.geoAlbers()
-    .scale(150000 )
+    .scale(145000 )
     .rotate([71.057,0])
     .center([0, 42.354175])
     .translate([(.35*width/2), (.35*height/2)]);
