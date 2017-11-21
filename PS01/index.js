@@ -135,47 +135,34 @@ d3.select('select')
         var widthSvg1 = document.getElementById('svg1').clientWidth;
         var heightSvg1 = document.getElementById('svg1').clientHeight;
 
-        //map function for Boston map
-        var albersProjectionBoston = d3.geoAlbers()
-            .scale(155000 )
-            .rotate([71.057,0])
-            .center([0, 42.313])
-            .translate([(widthSvg1/2), (heightSvg1/2)]);
-
-        var pathBoston = d3.geoPath()
-            .projection(albersProjectionBoston);
-
-
 
 
             console.log(selectCity);
             d3.json('./'+selectCity+'.json', function(dataIn){
+
+                var center = d3.geoCentroid(dataIn);
+                var scale  = 40000;
+                var offset = [widthSvg1/2, heightSvg1/2];
+                var projection = d3.geoMercator().scale(scale).center(center)
+                    .translate(offset);
+
+                // create the path
+                var pathCity = d3.geoPath().projection(projection);
+
                 //console.log(dataIn);
                 svg1.selectAll('path')
                     .data(dataIn.features)
                     .enter()
                     .append('path')
-                    .attr('d', pathBoston)
+                    .attr('d',pathCity)
                     .attr('fill', 'gainsboro')
                     .attr('stroke', 'white')
                     .attr('stroke-width', 1)
                     .attr('data-toggle',"tooltip")
                     .attr('title', function(d){
-                        if (d.properties.name == 'Downtown'){
-                            return 'CLICK ON THE DOT!'
-                        }
-                        else
-                            return d.properties.name;
+
                     })
                     .on('mouseover', function(d){
-                        if (d.properties.name == 'Downtown'){
-                            d3.select(this)
-                                .attr('fill', 'red');
-                        }
-                        else{
-                            d3.select(this)
-                                .attr('fill', 'yellow');
-                        }
 
                     })
                     .on('mouseout', function(d){
@@ -186,17 +173,16 @@ d3.select('select')
 
                     });
 
-                //   $('[data-toggle="tooltip"]').tooltip();
 
                 svg1.selectAll('circle')
                     .data(arrayList)
                     .enter()
                     .append('circle')
                     .attr('cx', function (d){
-                        return albersProjectionBoston([d.long, d.lat])[0];
+                        return projection([d.long, d.lat])[0];
                     })
                     .attr('cy', function (d){
-                        return albersProjectionBoston([d.long, d.lat])[1];
+                        return projection([d.long, d.lat])[1];
                     })
                     .attr('r', 5)
                     .attr('fill', 'steelblue')
@@ -243,6 +229,8 @@ d3.select('select')
                 $('[data-toggle="tooltip"]').tooltip();
 
 
+
+
             });
 
 
@@ -275,3 +263,8 @@ d3.select('select')
 
 
     });
+
+
+function updateData(data){
+
+}
