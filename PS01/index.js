@@ -151,7 +151,7 @@ function drawMap(selectCity){
         .remove();
 
     svg2.selectAll('rect')
-        .attr('opacity',0);
+        .remove();
 
     var widthSvg1 = document.getElementById('svg1').clientWidth;
     var heightSvg1 = document.getElementById('svg1').clientHeight;
