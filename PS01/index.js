@@ -5,7 +5,6 @@ var height = document.getElementById('svg1').clientHeight;
 var width = document.getElementById('svg0').clientWidth;
 var height = document.getElementById('svg0').clientHeight;
 
-console.log(height);
 
 var marginLeft = 0;
 var marginTop = 0;
@@ -149,6 +148,8 @@ function drawMap(selectCity){
 
     var widthSvg1 = document.getElementById('svg1').clientWidth;
     var heightSvg1 = document.getElementById('svg1').clientHeight;
+
+    console.log(widthSvg1, heightSvg1);
 
     d3.json('./'+selectCity+'.json', function(dataIn){
 
