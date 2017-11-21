@@ -53,7 +53,8 @@ var cityArrary = ['BOSTON IN MA',
 
 //Downtown area position
 var arrayList = [
-    {long:-71.056612, lat:42.354175}
+    {long:-71.056612, lat:42.354175},
+    {long:-73.96625, lat:40.78343}
 ];
 
 
@@ -129,111 +130,122 @@ d3.json('./cb_2016_us_state_20m.json', function(dataIn){
 d3.select('select')
     .on('change', function(d){
         var selectCity = d3.select('select').property('value');
-        console.log(selectCity);
 
 
-        var widthSvg1 = document.getElementById('svg1').clientWidth;
-        var heightSvg1 = document.getElementById('svg1').clientHeight;
-
-
-
-            console.log(selectCity);
-            d3.json('./'+selectCity+'.json', function(dataIn){
-
-                var center = d3.geoCentroid(dataIn);
-                var scale  = 40000;
-                var offset = [widthSvg1/2, heightSvg1/2];
-                var projection = d3.geoMercator().scale(scale).center(center)
-                    .translate(offset);
-
-                // create the path
-                var pathCity = d3.geoPath().projection(projection);
-
-                //console.log(dataIn);
-                svg1.selectAll('path')
-                    .data(dataIn.features)
-                    .enter()
-                    .append('path')
-                    .attr('d',pathCity)
-                    .attr('fill', 'gainsboro')
-                    .attr('stroke', 'white')
-                    .attr('stroke-width', 1)
-                    .attr('data-toggle',"tooltip")
-                    .attr('title', function(d){
-
-                    })
-                    .on('mouseover', function(d){
-
-                    })
-                    .on('mouseout', function(d){
-                        d3.select(this)
-                            .attr('fill', 'gainsboro');
-                    })
-                    .on('click', function(d){
-
-                    });
-
-
-                svg1.selectAll('circle')
-                    .data(arrayList)
-                    .enter()
-                    .append('circle')
-                    .attr('cx', function (d){
-                        return projection([d.long, d.lat])[0];
-                    })
-                    .attr('cy', function (d){
-                        return projection([d.long, d.lat])[1];
-                    })
-                    .attr('r', 5)
-                    .attr('fill', 'steelblue')
-                    .attr('data-toggle',"tooltip")
-                    .attr('title', 'CLICK ON ME!')
-                    .on('mouseover', function(d){
-                        console.log('show some thing');
-                        d3.select(this)
-                        //why this tooltip not work!
-
-                            .transition()
-                            .duration(3000)
-                            .ease(d3.easeBounce)
-                            .attr('fill', 'red')
-                            .attr('r', 20)
-                            .attr('opacity', .8)
-                            .attr('stroke', 'white')
-                            .attr('stroke-width', 0.5);
-
-                    })
-
-                    .on('mouseout', function(d){
-                        d3.select(this)
-                            .transition()
-                            .duration(3000)
-                            .ease(d3.easeBounce)
-                            .attr('fill', 'steelblue')
-                            .attr('stroke', 'none')
-                            .attr('r', 5);
-                    })
-
-                    .on('click', function(d){
-                        d3.select(this)
-                            .attr('fill', 'red')
-                            .attr('r', 10);
-                        d3.select('.background')
-                            .transition()
-                            .duration(3000)
-                            .ease(d3.easeBounce)
-                            .attr('opacity', 1);
-
-                    });
-
-                $('[data-toggle="tooltip"]').tooltip();
+        drawMap(selectCity);
 
 
 
+
+    });
+
+
+function drawMap(selectCity){
+
+    svg1.selectAll('path')
+        .remove();
+    svg1.selectAll('circle')
+        .remove();
+
+    svg2.selectAll('pattern')
+        .remove();
+
+    svg2.selectAll('rect')
+        .attr('opacity',0);
+
+    var widthSvg1 = document.getElementById('svg1').clientWidth;
+    var heightSvg1 = document.getElementById('svg1').clientHeight;
+
+    d3.json('./'+selectCity+'.json', function(dataIn){
+
+        var center = d3.geoCentroid(dataIn);
+        var scale  = 40000;
+        var offset = [widthSvg1/2, heightSvg1/2];
+        var projection = d3.geoMercator().scale(scale).center(center)
+            .translate(offset);
+
+        // create the path
+        var pathCity = d3.geoPath().projection(projection);
+
+        //console.log(dataIn);
+        var pathMap= svg1.selectAll('path')
+            .data(dataIn.features)
+            .enter()
+            .append('path')
+            .attr('d',pathCity)
+            .attr('fill', 'gainsboro')
+            .attr('stroke', 'white')
+            .attr('stroke-width', 1)
+            .attr('data-toggle',"tooltip")
+            .attr('title', function(d){
+
+            })
+            .on('mouseover', function(d){
+
+            })
+            .on('mouseout', function(d){
+                d3.select(this)
+                    .attr('fill', 'gainsboro');
+            })
+            .on('click', function(d){
 
             });
 
+        console.log('here');
 
+        svg1.selectAll('circle')
+            .data(arrayList)
+            .enter()
+            .append('circle')
+            .attr('cx', function (d){
+                return projection([d.long, d.lat])[0];
+            })
+            .attr('cy', function (d){
+                return projection([d.long, d.lat])[1];
+            })
+            .attr('r', 5)
+            .attr('fill', 'steelblue')
+            .attr('data-toggle',"tooltip")
+            .attr('title', 'CLICK ON ME!')
+            .on('mouseover', function(d){
+                console.log('show some thing');
+                d3.select(this)
+                //why this tooltip not work!
+
+                    .transition()
+                    .duration(3000)
+                    .ease(d3.easeBounce)
+                    .attr('fill', 'red')
+                    .attr('r', 20)
+                    .attr('opacity', .8)
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 0.5);
+
+            })
+
+            .on('mouseout', function(d){
+                d3.select(this)
+                    .transition()
+                    .duration(3000)
+                    .ease(d3.easeBounce)
+                    .attr('fill', 'steelblue')
+                    .attr('stroke', 'none')
+                    .attr('r', 5);
+            })
+
+            .on('click', function(d){
+                d3.select(this)
+                    .attr('fill', 'red')
+                    .attr('r', 10);
+                d3.select('.background')
+                    .transition()
+                    .duration(3000)
+                    .ease(d3.easeBounce)
+                    .attr('opacity', 1);
+
+            });
+
+        $('[data-toggle="tooltip"]').tooltip();
 
 
 
@@ -263,8 +275,5 @@ d3.select('select')
 
 
     });
-
-
-function updateData(data){
 
 }
