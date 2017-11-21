@@ -53,7 +53,8 @@ var cityArrary = ['BOSTON IN MA',
 
 //Downtown area position
 var arrayList = [
-    {long:-71.056612, lat:42.354175}
+    {long:-71.056612, lat:42.354175},
+    {long:-73.96625, lat:40.78343}
 ];
 
 
@@ -131,10 +132,6 @@ d3.select('select')
         var selectCity = d3.select('select').property('value');
 
 
-
-
-
-
         drawMap(selectCity);
 
 
@@ -152,6 +149,10 @@ function drawMap(selectCity){
 
     svg2.selectAll('pattern')
         .remove();
+
+    svg2.selectAll('rect')
+        .attr('opacity',0);
+
 
     var widthSvg1 = document.getElementById('svg1').clientWidth;
     var heightSvg1 = document.getElementById('svg1').clientHeight;
@@ -247,30 +248,33 @@ console.log('here');
 
         $('[data-toggle="tooltip"]').tooltip();
 
+
+
+
+        var defs = svg2.append('defs');
+        defs.append('pattern')
+            .attr('id','bg')
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', widthSvg1)
+            .attr('height', heightSvg1)
+            .append('image')
+            .attr('xlink:href', function(d){
+                return selectCity + '.png';
+
+            })
+            .attr('width', widthSvg1)
+            .attr('height', heightSvg1)
+            .attr('x', 0)
+            .attr('y', 0);
+
+        svg2.append('rect')
+            .attr('class', 'background')
+            .attr('width', widthSvg1)
+            .attr('height', heightSvg1)
+            .attr('fill', 'url(#bg)')
+            .attr('opacity', 0);
+
+
     });
-
-
-    var defs = svg2.append('defs');
-    defs.append('pattern')
-        .attr('id','bg')
-        .attr('patternUnits', 'userSpaceOnUse')
-        .attr('width', widthSvg1)
-        .attr('height', heightSvg1)
-        .append('image')
-        .attr('xlink:href', function(d){
-            return selectCity + '.png';
-
-        })
-        .attr('width', widthSvg1)
-        .attr('height', heightSvg1)
-        .attr('x', 0)
-        .attr('y', 0);
-
-    svg2.append('rect')
-        .attr('class', 'background')
-        .attr('width', widthSvg1)
-        .attr('height', heightSvg1)
-        .attr('fill', 'url(#bg)')
-        .attr('opacity', 0);
 
 }
