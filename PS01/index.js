@@ -118,7 +118,7 @@ d3.json('./cb_2016_us_state_20m.json', function(dataIn){
             document.getElementById('cityForm').style.display = 'inline-block';
             document.getElementById('svgdiv1').style.display = 'inline-block';
             document.getElementById('svgdiv2').style.display = 'inline-block';
-            document.getElementById('buttondiv').style.display = 'inline-block';
+
 
         });
 });
@@ -128,14 +128,31 @@ d3.json('./cb_2016_us_state_20m.json', function(dataIn){
 d3.select('select')
     .on('change', function(d){
         var selectCity = d3.select('select').property('value');
+        console.log(selectCity);
+        document.getElementById('buttondiv').style.display = 'none';
 
-        drawMap(selectCity);
+        if(selectCity != 'SELECT THE CITY'){
 
+            drawMap(selectCity);
+        }
+        else{
+
+            svg1.selectAll('path')
+                .remove();
+            svg1.selectAll('circle')
+                .remove();
+
+            svg2.selectAll('pattern')
+                .remove();
+            svg2.selectAll('rect')
+                .remove();
+            svg2.selectAll('circle')
+                .remove();
+        }
     });
 
 
 function drawMap(selectCity){
-
     svg1.selectAll('path')
         .remove();
     svg1.selectAll('circle')
@@ -145,16 +162,14 @@ function drawMap(selectCity){
         .remove();
     svg2.selectAll('rect')
         .remove();
+    svg2.selectAll('circle')
+        .remove();
 
     var widthSvg1 = document.getElementById('svg1').clientWidth;
     var heightSvg1 = document.getElementById('svg1').clientHeight;
-
     console.log(widthSvg1, heightSvg1);
 
     d3.json('./'+selectCity+'.json', function(dataIn){
-
-        console.log(selectCity);
-
         var center = d3.geoCentroid(dataIn);
         var scale  = 40000;
         var offset = [widthSvg1/2, heightSvg1/2];
@@ -164,7 +179,6 @@ function drawMap(selectCity){
         // create the path
         var pathCity = d3.geoPath().projection(projection);
 
-        //console.log(dataIn);
         var pathMap= svg1.selectAll('path')
             .data(dataIn.features)
             .enter()
@@ -180,7 +194,6 @@ function drawMap(selectCity){
             .on('mouseover', function(d){
                 d3.select(this)
                     .attr('fill', 'yellow');
-
             })
             .on('mouseout', function(d){
                 d3.select(this)
@@ -190,7 +203,6 @@ function drawMap(selectCity){
 
             });
 
-        console.log('here');
 
         svg1.selectAll('circle')
             .data(arrayList)
@@ -233,6 +245,9 @@ function drawMap(selectCity){
             })
 
             .on('click', function(d){
+
+                document.getElementById('buttondiv').style.display = 'inline-block';
+
                 d3.select(this)
                     .attr('fill', 'red')
                     .attr('r', 10);
@@ -247,8 +262,6 @@ function drawMap(selectCity){
         $('[data-toggle="tooltip"]').tooltip();
 
 
-
-
         var defs = svg2.append('defs');
         defs.append('pattern')
             .attr('id','bg')
@@ -258,7 +271,6 @@ function drawMap(selectCity){
             .append('image')
             .attr('xlink:href', function(d){
                 return selectCity + '.png';
-
             })
             .attr('width', widthSvg1)
             .attr('height', heightSvg1)
@@ -271,8 +283,85 @@ function drawMap(selectCity){
             .attr('height', heightSvg1)
             .attr('fill', 'url(#bg)')
             .attr('opacity', 0);
-
-
     });
+}
+
+
+var nestedData = [];
+
+///////////////Button functions////////////////////////////////////
+d3.select('#show_points')
+    .on('click', function(){
+        d3.csv('./CityMap.csv', function(dataIn){
+
+            nestedData = d3.nest()
+                .key(function(d){return d.city})
+                .entries(dataIn);
+
+            dataCity = dataIn.filter(function(d){
+                return d.city == 'BOSTON IN MA';
+            });
+
+            svg2.selectAll('circle')
+                .data(dataCity)
+                .enter()
+                .append('circle')
+                .attr('class','myCircles');
+
+console.log(dataCity);
+
+            drawPoints(dataCity);
+
+            svg2.selectAll('circle')
+                .transition()
+                .duration(2000)
+                .ease(d3.easeBounce)
+                .attr('opacity', 1);
+        });
+    });
+
+
+
+
+
+//////////////////////Draw cirlce function/////////////////////
+function drawPoints(dataIn){
+    svg2.selectAll('.myCircles')
+        .data(dataIn)
+        .attr('cx',function(d){
+            return d.x;
+        })
+        .attr('cy', function(d){
+            return d.y;
+        })
+        .attr('r', function(d){
+            return d.r;
+        })
+        .attr('fill', function(d){
+            return d.fill;
+        })
+        .attr('stroke', function(d){
+            return d.stroke;
+        })
+        .attr('stroke-width',function(d){
+            return d.strokewidth;
+        })
+        .on('mouseover', function(d) {
+            d3.select(this)
+                .attr('fill', 'yellow');
+        })
+        .on('mouseout', function(d){
+            d3.select(this)
+                .attr('fill', function(d){
+                    return d.fill;
+                })
+        })
+
+        .attr('data-toggle',"tooltip")
+        .attr('title', function(d){
+            return d.name;
+        });
+
+    $('[data-toggle="tooltip"]').tooltip();
 
 }
