@@ -36,28 +36,27 @@ var albersProjection = d3.geoAlbersUsa()
     .scale(1000)
     .translate([(width/2), (height/2)]);
 
-
 var path = d3.geoPath()
     .projection(albersProjection);
-
 
 
 //variaty for the cities
 var cityArrary = ['BOSTON IN MA',
     'NEW YORK IN NY',
-    'CHICAGO IN CA',
-    'LOS ANGELES IN IL',
+    'CHICAGO IN IL',
+    'LOS ANGELES IN CA',
     'PHOENIX IN AZ',
     'SEATTLE IN WA'];
-
 
 //Downtown area position
 var arrayList = [
     {long:-71.056612, lat:42.354175},
-    {long:-73.96625, lat:40.78343}
+    {long:-73.96625, lat:40.78343},
+    {long:-87.65005, lat:41.85003},
+    {long:-118.24368, lat:34.05223},
+    {long:-112.07404, lat:33.44838},
+    {long:-122.33207, lat:47.60621}
 ];
-
-
 
 
 
@@ -131,11 +130,7 @@ d3.select('select')
     .on('change', function(d){
         var selectCity = d3.select('select').property('value');
 
-
         drawMap(selectCity);
-
-
-
 
     });
 
@@ -149,7 +144,6 @@ function drawMap(selectCity){
 
     svg2.selectAll('pattern')
         .remove();
-
     svg2.selectAll('rect')
         .remove();
 
@@ -157,6 +151,8 @@ function drawMap(selectCity){
     var heightSvg1 = document.getElementById('svg1').clientHeight;
 
     d3.json('./'+selectCity+'.json', function(dataIn){
+
+        console.log(selectCity);
 
         var center = d3.geoCentroid(dataIn);
         var scale  = 40000;
@@ -181,6 +177,8 @@ function drawMap(selectCity){
 
             })
             .on('mouseover', function(d){
+                d3.select(this)
+                    .attr('fill', 'yellow');
 
             })
             .on('mouseout', function(d){
